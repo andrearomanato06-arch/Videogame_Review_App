@@ -15,7 +15,7 @@ public class Review
     public long VideogameId {get;set;}
     public Videogame Videogame {get;set;}
 
-    public long UserId{get;set;}
+    public long? UserId{get;set;}
     public User User {get;set;}
 
 }

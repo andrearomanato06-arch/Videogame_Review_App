@@ -20,7 +20,7 @@ public class Videogame
 
     public List<Review> Reviews {get;set;} = [];
 
-    public long AuthorId {get;set;}
+    public long? AuthorId {get;set;}
     public Author Author {get;set;}
 
     public List<VideogamePlatform> VideogamePlatforms {get;set;} = [];

@@ -54,7 +54,7 @@ public class AppDbContext : DbContext
             r.HasKey(r => r.Id);
            
             r.Property(r => r.Id).ValueGeneratedOnAdd();
-            r.Property(r => r.Score).HasColumnName("score").IsRequired(false);
+            r.Property(r => r.Score).HasColumnName("score");
             r.Property(r => r.Description).HasColumnName("description").HasMaxLength(500).IsRequired();
             r.Property(r => r.ReviewDate).HasColumnName("review_date").IsRequired();
             r.Property(r => r.VideogameId).HasColumnName("videogame_id");
