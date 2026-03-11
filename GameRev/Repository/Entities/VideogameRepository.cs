@@ -92,7 +92,7 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
 
     private IQueryable<Videogame> FilterByRating(IQueryable<Videogame> query, double? start, double? end)
     {
-        start = start is null ? 0.0 : start;
+        start = start is null ? 1.0 : start;
         end = end is null ? 5.0 : end;
         
         return query

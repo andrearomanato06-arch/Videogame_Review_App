@@ -9,6 +9,9 @@ public static class RepositoryConfiguration
     {
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPlatformRepository, PlatformRepository>();
+        services.AddScoped<IVideogameRepository, VideogameRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
         return services;
     }
 }
