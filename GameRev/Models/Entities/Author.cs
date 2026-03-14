@@ -1,8 +1,6 @@
 namespace GameRev.Models.Entities;
 
-using System;
 using System.Collections.Generic;
-using GameRev.DTOs.Requests;
 
 public class Author
 {

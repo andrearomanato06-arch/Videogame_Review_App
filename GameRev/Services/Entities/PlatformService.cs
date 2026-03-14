@@ -1,6 +1,8 @@
+using GameRev.DTOs.Mappers;
 using GameRev.DTOs.Requests;
+using GameRev.DTOs.Requests.Update;
 using GameRev.DTOs.Responses;
-using GameRev.Models.Entities;
+using GameRev.Models.Utils;
 using GameRev.Repository.Entities.Interfaces;
 using GameRev.Services.Interfaces;
 
@@ -18,14 +20,10 @@ public class PlatformService : IPlatformService
 
     public async Task<PlatformResponse?> AddAsync(PlatformRequest request, CancellationToken ct)
     {
-        var platform = new Platform {Name = request.Name};
+        var platform = DtosToModels.PlatformRequestToPlatform(request);
         var response = await platformRepository.AddAsync(platform,ct);
         return response is not null 
-        ? new PlatformResponse
-        {
-            Id = response.Id,
-            Name = response.Name
-        }
+        ? ModelsToDtos.PlatformToPlatformResponse(response)
         : null;
     }
 
@@ -39,39 +37,22 @@ public class PlatformService : IPlatformService
     public async Task<List<PlatformResponse>> GetAllAsync(CancellationToken ct)
     {
         var platforms = await platformRepository.GetAllAsync(ct);
-        List<PlatformResponse> response = [];
-        foreach(Platform platform in platforms)
-        {
-            response.Add(new PlatformResponse
-            {
-               Id = platform.Id,
-               Name = platform.Name 
-            });
-        }
-        return response;
+        return ModelsToDtos.PlatformToPlatformResponse(platforms);   
     }
 
     public async Task<PlatformResponse?> GetByIdAsync(long id, CancellationToken ct)
     {
-        var response = await platformRepository.GetByIdAsync(id,ct);
-        return response is not null
-        ? new PlatformResponse
-        {
-            Id = response.Id,
-            Name = response.Name
-        }
+        var platform = await platformRepository.GetByIdAsync(id,ct);
+        return platform is not null
+        ? ModelsToDtos.PlatformToPlatformResponse(platform)
         : null;
     }
 
     public async Task<PlatformResponse?> GetByNameAsync(string name, CancellationToken ct)
     {
-        var response = await platformRepository.GetByNameAsync(name,ct);
-        return response is not null
-        ? new PlatformResponse
-        {
-            Id = response.Id,
-            Name = response.Name
-        }
+        var platform = await platformRepository.GetByNameAsync(name,ct);
+        return platform is not null
+        ? ModelsToDtos.PlatformToPlatformResponse(platform)
         : null;
     }
 
@@ -79,7 +60,7 @@ public class PlatformService : IPlatformService
     {
         var platform = await platformRepository.GetByIdAsync(request.Id,ct);
         if(platform is null) return false;
-        platform.Name = request.Name;
+        UpdateModel.UpdatePlatformFromDto(platform,request);
         return await platformRepository.UpdateAsync(platform,ct);
     }
 }

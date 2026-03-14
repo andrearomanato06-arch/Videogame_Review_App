@@ -18,9 +18,9 @@ public class AppDbContext : DbContext
     public DbSet<JwtToken> JwtTokens { get; set; }
     public DbSet<VideogamePlatform> VideogamePlatforms { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder mb)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        mb.Entity<Author>(a =>
+        modelBuilder.Entity<Author>(a =>
         {
             a.HasKey(a => a.Id);
 
@@ -30,7 +30,7 @@ public class AppDbContext : DbContext
             a.Property(a => a.Name).HasColumnName("name").HasMaxLength(128).IsRequired();
         });
 
-        mb.Entity<Platform>(p =>
+        modelBuilder.Entity<Platform>(p =>
         {
             p.HasKey(p => p.Id);
 
@@ -40,7 +40,7 @@ public class AppDbContext : DbContext
             p.Property(p => p.Name).HasColumnName("name").HasMaxLength(128).IsRequired();
         });
 
-        mb.Entity<Videogame>(v =>
+        modelBuilder.Entity<Videogame>(v =>
         {
             v.HasKey(v => v.Id);
             
@@ -58,7 +58,7 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.SetNull);
         });
 
-        mb.Entity<Review>(r =>
+        modelBuilder.Entity<Review>(r =>
         {
             r.HasKey(r => r.Id);
            
@@ -80,7 +80,7 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.SetNull);
         });
 
-        mb.Entity<User>(u =>
+        modelBuilder.Entity<User>(u =>
         {
             u.HasKey(u => u.Id);
             
@@ -96,7 +96,7 @@ public class AppDbContext : DbContext
             u.Property(u => u.Role).HasColumnName("role").HasDefaultValue(UserRole.BASIC).IsRequired();
         });
 
-        mb.Entity<VideogamePlatform>(vp =>
+        modelBuilder.Entity<VideogamePlatform>(vp =>
         {
             vp.HasKey(vp => new { vp.VideogameId, vp.PlatformId });
             
@@ -114,7 +114,7 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
         });
 
-        mb.Entity<JwtToken>(j =>
+        modelBuilder.Entity<JwtToken>(j =>
         {
            j.HasKey(j => j.Id);
            

@@ -1,8 +1,6 @@
-namespace GameRev.Models.Entities;
+namespace GameRev.DTOs.Responses;
 
-using System;
-
-public class Review
+public class ReviewResponse
 {
     public long Id {get;set;}
 
@@ -13,9 +11,7 @@ public class Review
     public DateTime ReviewDate {get;set;}
 
     public long VideogameId {get;set;}
-    public Videogame Videogame {get;set;}
 
     public long? UserId{get;set;}
-    public User User {get;set;}
-
+   
 }

@@ -1,6 +1,7 @@
 namespace GameRev.Services.Interfaces;
 
 using GameRev.DTOs.Requests;
+using GameRev.DTOs.Requests.Update;
 using GameRev.DTOs.Responses;
 public interface IPlatformService
 {
