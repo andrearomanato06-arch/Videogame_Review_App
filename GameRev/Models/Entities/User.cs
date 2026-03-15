@@ -23,7 +23,7 @@ public class User
 
     public List<Review> Reviews {get;set;} = [];
 
-    public JwtToken? Token {get;set;}
-    public long? TokenId {get;set;}
+    public UserSession? UserSession {get;set;}
+    public long? Jtid {get;set;}
 }
 

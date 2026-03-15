@@ -6,7 +6,7 @@ namespace GameRev.Configurations;
 
 public static class ServiceConfiguration
 {
-    public static IServiceCollection AddServicesCollection(this IServiceCollection service)
+    public static IServiceCollection AddServices(this IServiceCollection service)
     {
         service.AddScoped<IAuthorService, AuthorService>();
         service.AddScoped<IPlatformService,PlatformService>();

@@ -1,10 +1,8 @@
 namespace GameRev.Models.Auth;
 using GameRev.Models.Entities;
-public class JwtToken
+public class UserSession
 {
-    public long Id {get;set;}
-
-    public string Token {get;set;}
+    public long Jtid {get;set;}
 
     public DateTime IssuedAt {get;set;}
 

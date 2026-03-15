@@ -15,7 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Videogame> Videogames { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<JwtToken> JwtTokens { get; set; }
+    public DbSet<UserSession> UserSessions { get; set; }
     public DbSet<VideogamePlatform> VideogamePlatforms { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -114,16 +114,15 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<JwtToken>(j =>
+        modelBuilder.Entity<UserSession>(j =>
         {
-           j.HasKey(j => j.Id);
+           j.HasKey(j => j.Jtid);
            
-           j.Property(j => j.Id).ValueGeneratedOnAdd().HasColumnName("jwt_token_id");
-           j.Property(j => j.Token).HasColumnName("token").IsRequired();
+           j.Property(j => j.Jtid).ValueGeneratedOnAdd().HasColumnName("jwt_token_id");
 
            j.HasOne(j => j.User)
-           .WithOne(u => u.Token)
-           .HasForeignKey<JwtToken>(j => j.UserId)
+           .WithOne(u => u.UserSession)
+           .HasForeignKey<UserSession>(j => j.UserId)
            .OnDelete(DeleteBehavior.Cascade);
         });
     }
