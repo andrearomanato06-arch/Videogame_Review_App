@@ -4,6 +4,9 @@ using GameRev.Models.Entities;
 using GameRev.Repository.Entities.Interfaces;
 using GameRev.Repository.Generic;
 using GameRev.DTOs.Filters;
+using GameRev.DTOs.Responses;
+using GameRev.DTOs.Mappers;
+using System.Security.Principal;
 
 namespace GameRev.Repository.Entities;
 
@@ -23,7 +26,7 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
             return [];
         }
         return await context.Videogames
-        .Where(v => v.Platforms.Any(p => p.Name.ToLower().Equals(platform.ToLower())))
+        .Where(v => v.Platforms.Any(p => p.Name.Equals(platform)))
         .Include(v => v.Platforms)
         .AsNoTracking()
         .ToListAsync(ct);
@@ -31,19 +34,36 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
 
     public async Task<Videogame?> GetByTitleAsync (string title, CancellationToken ct)
     {
-        return await context.Videogames.FirstOrDefaultAsync(v => v.Title.Equals(title),ct);
+        return await context.Videogames.FirstOrDefaultAsync(v => v.Title.Contains(title),ct);
     }
 
-    public async Task<List<Videogame>> GetNewAsync (CancellationToken ct)
+    public async Task<PagedResponse<MinimalVideogameResponse>> GetNewAsync (int page, int elementsToShow, CancellationToken ct)
     {
         DateOnly timeSpan = DateOnly.FromDateTime(DateTime.Now).AddDays(-60);
-        return await context.Videogames.Where(v => v.ReleaseDate >=  timeSpan ).ToListAsync(ct);
+
+        var query = context.Videogames.Where(v => v.ReleaseDate >=  timeSpan );
+        var totalElements = await query.CountAsync(ct);
+
+        var videogames = await query
+        .OrderByDescending(g => g.ReleaseDate)
+        .Skip((page - 1) * elementsToShow)
+        .Take(elementsToShow)
+        .ToListAsync(ct);
+
+        return new PagedResponse<MinimalVideogameResponse>
+        {
+           Elements = ModelsToDtos.VideogameToMinimalVideogameResponse(videogames),
+           CurrentPage = page,
+           TotalElements =  totalElements,
+           TotalPages = (int)Math.Ceiling(totalElements/(double)elementsToShow)
+        }; 
     }
 
-    public async Task<List<Videogame>> GetMostLikedAsync (int elementsToShow , CancellationToken ct)
+    public async Task<PagedResponse<MinimalVideogameResponse>> GetMostLikedAsync (int page, int elementsToShow , CancellationToken ct)
     {
         elementsToShow = elementsToShow < 10 ? 10 : elementsToShow;
-        return await context.Videogames
+
+        var query = context.Videogames
             .Where(v => v.Reviews.Any())
             .Select( v => new
                 {
@@ -51,17 +71,43 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
                     AvgRating = v.Reviews.Average(r => r.Rating)
                 }
             )
-            .Where(result => result.AvgRating >= 4.0 && result.AvgRating <= 5.0)
-            .OrderByDescending(x => x.AvgRating)
-            .Select(result => result.Game)
+            .Where(result => result.AvgRating >= 3.5 && result.AvgRating <= 5.0);
+        
+        var totalElements = await query.CountAsync(ct);
+
+        var videogames = await query
+            .OrderByDescending(g => g.AvgRating)
+            .Skip((page - 1) * elementsToShow)
             .Take(elementsToShow)
+            .Select(g => g.Game)
             .ToListAsync(ct);
+        
+        return new PagedResponse<MinimalVideogameResponse>
+        {
+           Elements = ModelsToDtos.VideogameToMinimalVideogameResponse(videogames),
+           CurrentPage = page,
+           TotalElements = totalElements,
+           TotalPages = (int) Math.Ceiling(totalElements/(double)elementsToShow) 
+        }; 
     }
 
-    public async Task<List<Videogame>> SearchAsync (VideogameSearchFilter filter, CancellationToken ct)
+    public async Task<PagedResponse<MinimalVideogameResponse>> SearchAsync (VideogameSearchFilter filter, int page, int elementsToShow, CancellationToken ct)
     {
-        var query = CreateQuery(filter);
-        return await query.OrderBy(v => v.Title).ToListAsync(ct);
+        var query = CreateQuery(filter).OrderBy(v => v.Title);
+        var totalElements = await query.CountAsync(ct);
+
+        var videogames = await query.
+            Skip((page-1)*elementsToShow)
+            .Take(elementsToShow)
+            .ToListAsync(ct);
+
+        return new PagedResponse<MinimalVideogameResponse>
+        {
+            Elements = ModelsToDtos.VideogameToMinimalVideogameResponse(videogames),
+            CurrentPage = page,
+            TotalElements = totalElements,
+            TotalPages = (int)Math.Ceiling(totalElements/(double)elementsToShow)
+        };
     }
 
     private IQueryable<Videogame> CreateQuery (VideogameSearchFilter filter)
@@ -72,7 +118,7 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
             query = query.Where(v => v.Title.ToLower().Contains(filter.Title.ToLower()));
 
         if(filter.Platform != null)
-            query = query.Where(v => v.Platforms.Any(p => p.Name.ToLower().Contains(filter.Platform.ToLower())));
+            query = query.Where(v => v.Platforms.Any(p => p.Name.Contains(filter.Platform)));
 
         if(filter.Year != null)
         {
@@ -84,8 +130,8 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
         if(filter.Objectives != null)
             query = query.Where(v => v.Objectives >= filter.Objectives);
         
-
-        query = FilterByRating(query, filter.RatingStart, filter.RatingEnd);
+        if(filter.RatingStart != null || filter.RatingEnd != null)
+            query = FilterByRating(query, filter.RatingStart, filter.RatingEnd);
         
         return query;
     }
@@ -104,5 +150,29 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
             })
             .Where(x => x.AvgRating >= start && x.AvgRating <= end)
             .Select(x => x.Videogame);
+    }
+
+    public async Task<List<MinimalVideogameResponse>> GetCasualGames (int limit, CancellationToken ct)
+    {
+        var videogames = await context.Videogames
+            .OrderBy(g => Guid.NewGuid())
+            .Take(limit)
+            .ToListAsync(ct);
+
+        return ModelsToDtos.VideogameToMinimalVideogameResponse(videogames);
+    }
+
+    public async new Task<VideogameResponse> GetByIdAsync(long id, CancellationToken ct)
+    {
+        var videogame = await context.Videogames
+        .Where(v => v.Id == id)
+        .Select(gr => new
+        {
+            Videogame = gr,
+            AvgRating = gr.Reviews.Average(r => r.Rating)
+        })
+        .FirstOrDefaultAsync(ct);
+
+        return ModelsToDtos.VideogameToVideogameResponse(videogame.Videogame, videogame.AvgRating);
     }
 }

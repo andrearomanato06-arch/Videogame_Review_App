@@ -8,7 +8,7 @@ public class VideogameRequest
 
     public string Description {get;set;}
 
-    public string CoverImage {get;set;}
+    public IFormFile CoverImage {get;set;}
 
     public int Objectives {get;set;} = 0;
 

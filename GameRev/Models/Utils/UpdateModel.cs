@@ -36,7 +36,7 @@ public static class UpdateModel
             review.Description = request.Description;        
     }
 
-    public static void UpdateVideogameFromDto(Videogame videogame, UpdateVideogameRequest request)
+    public static void UpdateVideogameFromDto(Videogame videogame, UpdateVideogameRequest request, string? coverImage)
     {
         if(request.Title is not null)
             videogame.Title = request.Title;
@@ -44,8 +44,8 @@ public static class UpdateModel
         if(request.Description is not null)
             videogame.Description = request.Description;
 
-        if(request.CoverImage is not null)
-            videogame.CoverImage = request.CoverImage;
+        if(coverImage is not null)
+            videogame.CoverImage = coverImage;
 
         if(request.ReleaseDate is not null)
             videogame.ReleaseDate = (DateOnly) request.ReleaseDate;                

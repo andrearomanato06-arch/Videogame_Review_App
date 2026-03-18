@@ -21,4 +21,6 @@ public class VideogameResponse
     public List <Platform> Platforms {get;set;} = [];
 
     public long? AuthorId {get;set;} 
+
+    public double AverageRating {get;set;} = 1.0;
 }

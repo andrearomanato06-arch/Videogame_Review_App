@@ -45,13 +45,13 @@ public static class DtosToModels
         };
     }
 
-    public static Videogame VideogameRequestToVideogame (VideogameRequest request)
+    public static Videogame VideogameRequestToVideogame (VideogameRequest request, string coverImagePath)
     {
         return new Videogame
         {
             Title = request.Title,
             Description = request.Description,
-            CoverImage = request.CoverImage,
+            CoverImage = coverImagePath,
             Objectives = request.Objectives,
             ReleaseDate = request.ReleaseDate,
             Released = request.Released,

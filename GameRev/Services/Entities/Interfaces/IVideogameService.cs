@@ -21,9 +21,11 @@ public interface IVideogameService
 
     Task<List<VideogameResponse>> GetByPlatformAsync (string platform, CancellationToken ct);
 
-    Task<List<VideogameResponse>> GetNewAsync (CancellationToken ct);
+    Task<PagedResponse<MinimalVideogameResponse>> GetNewAsync (int page, int elementsToShow, CancellationToken ct);
 
-    Task<List<VideogameResponse>> GetMostLikedAsync (int elementsToShow, CancellationToken ct);
+    Task<PagedResponse<MinimalVideogameResponse>> GetMostLikedAsync (int page, int elementsToShow, CancellationToken ct);
 
-    Task<List<VideogameResponse>> SearchAsync (VideogameSearchFilter filter, CancellationToken ct);
+    Task<PagedResponse<MinimalVideogameResponse>> SearchAsync (VideogameSearchFilter filter, int page, int elementsToShow, CancellationToken ct);
+
+    Task<List<MinimalVideogameResponse>> GetCasualGames (int limit, CancellationToken ct);
 }

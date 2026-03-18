@@ -36,7 +36,6 @@ builder.Services.AddAuthentication(
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = "PVC.sbiruli.it", //! ENV DATA
-        //ValidAudience = "bo-che-cazzo-ne-so", //! ENV DATA
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("simoncinolimoncinosbirulinoballerinopiccolinopatatinotonypitony"))
     };
 
@@ -67,11 +66,14 @@ builder.Services.AddAuthentication(
     };
 });
 
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.UseCors("GameRevPolicy");
 

@@ -121,7 +121,7 @@ public static class ModelsToDtos
             ReleaseDate = videogame.ReleaseDate,
             Released = videogame.Released,
             Platforms = videogame.Platforms,
-            AuthorId = videogame.AuthorId
+            AuthorId = videogame.AuthorId,
         };
     }
 
@@ -141,6 +141,38 @@ public static class ModelsToDtos
                 Released = videogame.Released,
                 Platforms = videogame.Platforms,
                 AuthorId = videogame.AuthorId            
+            });
+        }
+        return response;
+    }
+
+    public static VideogameResponse VideogameToVideogameResponse (Videogame videogame, double avgRating)
+    {
+        return new VideogameResponse
+        {
+            Id = videogame.Id,
+            Title = videogame.Title,
+            Description = videogame.Description,
+            CoverImage = videogame.CoverImage,
+            Objectives = videogame.Objectives,
+            ReleaseDate = videogame.ReleaseDate,
+            Released = videogame.Released,
+            Platforms = videogame.Platforms,
+            AuthorId = videogame.AuthorId,
+            AverageRating = avgRating
+        };
+    }
+
+    public static List<MinimalVideogameResponse> VideogameToMinimalVideogameResponse(List<Videogame> videogames)
+    {
+        List<MinimalVideogameResponse> response = [];
+        foreach(Videogame videogame in videogames)
+        {
+            response.Add(new MinimalVideogameResponse
+            {
+                Id = videogame.Id,
+                Title = videogame.Title,
+                CoverImagePath = videogame.CoverImage
             });
         }
         return response;
