@@ -26,6 +26,7 @@ public class PlatformController : ControllerBase
     public async Task<IActionResult> GetAll (CancellationToken ct)
     {
         var platforms = await platformService.GetAllAsync(ct);
+        platforms = platforms.OrderBy(p => p.Name).ToList();
         if(platforms.Count == 0)
         {
             return Ok("No platforms found");

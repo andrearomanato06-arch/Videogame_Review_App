@@ -154,10 +154,17 @@ public class VideogameRepository : GenericCrudRepository<Videogame>, IVideogameR
 
     public async Task<List<MinimalVideogameResponse>> GetCasualGames (int limit, CancellationToken ct)
     {
-        var videogames = await context.Videogames
-            .OrderBy(g => Guid.NewGuid())
-            .Take(limit)
-            .ToListAsync(ct);
+
+        var idList = await context.Videogames.OrderBy(v => v.Id).Select(v => v.Id).ToListAsync(ct);
+        List<long> selectedIds = [];
+        for(int i = 0; i < limit; i++)
+        {
+            int index = Random.Shared.Next(0,idList.Count);
+            selectedIds.Add(idList[index]);
+            idList.RemoveAt(index);
+        }
+
+        List<Videogame> videogames = await context.Videogames.Where(v => selectedIds.Contains(v.Id)).ToListAsync(ct);
 
         return ModelsToDtos.VideogameToMinimalVideogameResponse(videogames);
     }

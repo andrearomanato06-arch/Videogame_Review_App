@@ -131,10 +131,11 @@ public class VideogameService : IVideogameService
 
     private async Task<string?> SaveCoverImage (IFormFile image, string videogameTitle)
     {
-        string? path;
+        string? physicalPath;
+        string? relativeUrl;
         logger.LogInformation("File Name: {Ext}", image.FileName);
         var pathToStr = image.FileName.ToString();
-        var fileExtIndex = pathToStr.LastIndexOf(".");
+        var fileExtIndex = pathToStr.LastIndexOf("."); // get the extension by searching what's next the last "."
         var extension = pathToStr.Split(".", fileExtIndex);
         try
         {
@@ -145,14 +146,16 @@ public class VideogameService : IVideogameService
             }
 
             var fileName = videogameTitle.ToLower().Trim().Replace(" ", "-") + ".webp";
-            path = Path.Combine(webHostEnvironment.WebRootPath, "videogames", "covers", fileName);
+            fileName = fileName.Replace(":", "");
+            physicalPath = Path.Combine(webHostEnvironment.WebRootPath, "videogames", "covers", fileName);
+            relativeUrl = Path.Combine("videogames", "covers", fileName).Replace("\\", "/");
 
-            if (File.Exists(path))
+            if (File.Exists(physicalPath))
             {
-                File.Delete(path);
+                File.Delete(physicalPath);
             }
 
-            using (var stream = new FileStream(path, FileMode.Create))
+            using (var stream = new FileStream(physicalPath, FileMode.Create))
             {
                 await image.CopyToAsync(stream);    
             }
@@ -163,6 +166,6 @@ public class VideogameService : IVideogameService
             return null;
         }    
 
-        return path;
+        return relativeUrl;
     }
 }
